@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Love Map ❤️</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .admin-page {
+            min-height: 100vh;
+            padding: var(--spacing-md);
+        }
+
+        .admin-header {
+            background: var(--gradient-glass);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+            box-shadow: var(--shadow-card);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: var(--spacing-md);
+        }
+
+        .admin-title-section h1 {
+            margin-bottom: 0.5rem;
+        }
+
+        .admin-subtitle {
+            color: var(--dark-gray);
+            font-size: 1rem;
+        }
+
+        .milestone-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .milestone-card {
+            background: var(--gradient-glass);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-card);
+            transition: all var(--transition-normal);
+        }
+
+        .milestone-card.unlocked {
+            border-color: var(--rose-pink);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .milestone-card.locked {
+            opacity: 0.8;
+        }
+
+        .milestone-header {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .milestone-day {
+            font-size: 2.5rem;
+            filter: drop-shadow(0 2px 4px rgba(255, 107, 107, 0.3));
+        }
+
+        .milestone-info h3 {
+            margin: 0;
+            color: var(--warm-red);
+        }
+
+        .milestone-description {
+            color: var(--dark-gray);
+            font-size: 0.9rem;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--radius-full);
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: var(--spacing-sm);
+        }
+
+        .status-unlocked {
+            background: rgba(75, 181, 67, 0.2);
+            color: #2D7A29;
+        }
+
+        .status-locked {
+            background: rgba(0, 0, 0, 0.1);
+            color: var(--dark-gray);
+        }
+
+        .card-actions {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+            margin-top: var(--spacing-md);
+        }
+
+        .content-section {
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-md);
+            margin-top: var(--spacing-md);
+        }
+
+        .section-title {
+            font-family: var(--font-heading);
+            color: var(--warm-red);
+            margin-bottom: var(--spacing-sm);
+            font-size: 1.2rem;
+        }
+
+        .upload-area {
+            border: 2px dashed var(--lavender);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-md);
+            text-align: center;
+            transition: all var(--transition-normal);
+            cursor: pointer;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .upload-area:hover {
+            border-color: var(--rose-pink);
+            background: rgba(255, 182, 193, 0.1);
+        }
+
+        .upload-area input[type="file"] {
+            display: none;
+        }
+
+        .content-preview {
+            margin-top: var(--spacing-sm);
+        }
+
+        .reply-item {
+            background: rgba(255, 215, 0, 0.1);
+            border-left: 4px solid var(--gold);
+            padding: var(--spacing-sm);
+            border-radius: var(--radius-sm);
+            margin-top: var(--spacing-xs);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: var(--spacing-md);
+        }
+
+        .modal.active {
+            display: flex;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal-content {
+            background: var(--gradient-glass);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-card);
+            animation: unlock 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            color: var(--dark-gray);
+            transition: color var(--transition-fast);
+        }
+
+        .modal-close:hover {
+            color: var(--warm-red);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Floating Hearts Background -->
+    <div class="floating-hearts">
+        <div class="floating-heart" style="top: 10%;">❤️</div>
+        <div class="floating-heart" style="top: 30%;">💕</div>
+        <div class="floating-heart" style="top: 50%;">💝</div>
+        <div class="floating-heart" style="top: 70%;">💖</div>
+        <div class="floating-heart" style="top: 20%;">❤️</div>
+        <div class="floating-heart" style="top: 60%;">💕</div>
+        <div class="floating-heart" style="top: 40%;">💝</div>
+        <div class="floating-heart" style="top: 80%;">💖</div>
+        <div class="floating-heart" style="top: 15%;">❤️</div>
+    </div>
+
+    <div class="admin-page">
+        <div class="admin-header">
+            <div class="admin-title-section">
+                <h1>Admin Dashboard</h1>
+                <p class="admin-subtitle">From Me to You ❤️</p>
+            </div>
+            <button onclick="logout()" class="btn btn-secondary">
+                <span>Logout</span>
+            </button>
+        </div>
+
+        <div id="milestonesGrid" class="milestone-grid">
+            <!-- Milestones will be loaded here -->
+            <div class="spinner"></div>
+        </div>
+    </div>
+
+    <!-- Upload Content Modal -->
+    <div id="uploadModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Upload Surprise Content</h2>
+                <button class="modal-close" onclick="closeUploadModal()">&times;</button>
+            </div>
+
+            <form id="uploadForm">
+                <input type="hidden" id="milestoneId">
+
+                <div class="form-group">
+                    <label class="form-label">Content Type 💌</label>
+                    <select id="contentType" class="form-select">
+                        <option value="text">Text Message</option>
+                        <option value="image">Image</option>
+                        <option value="audio">Audio (Voice Note)</option>
+                        <option value="video">Video</option>
+                    </select>
+                </div>
+
+                <div id="textInput" class="form-group">
+                    <label class="form-label">Your Message 💝</label>
+                    <textarea id="textContent" class="form-textarea"
+                        placeholder="Write your heartfelt message..."></textarea>
+                </div>
+
+                <div id="fileInput" class="form-group hidden">
+                    <label class="form-label">Upload File 📎</label>
+                    <div class="upload-area" onclick="document.getElementById('fileUpload').click()">
+                        <p>📁 Click to select file</p>
+                        <small style="color: var(--dark-gray);">Images, Audio, or Video</small>
+                    </div>
+                    <input type="file" id="fileUpload" accept="image/*,audio/*,video/*">
+                    <div id="filePreview" class="content-preview"></div>
+                </div>
+
+                <div class="card-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <span>Upload Content ❤️</span>
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="closeUploadModal()">
+                        <span>Cancel</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- View Replies Modal -->
+    <div id="repliesModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Her Response 💬</h2>
+                <button class="modal-close" onclick="closeRepliesModal()">&times;</button>
+            </div>
+            <div id="repliesContent">
+                <!-- Replies will be loaded here -->
+            </div>
+            <button class="btn btn-secondary" onclick="closeRepliesModal()"
+                style="width: 100%; margin-top: var(--spacing-md);">
+                <span>Close</span>
+            </button>
+        </div>
+    </div>
+
+    <script src="/js/auth.js"></script>
+    <script src="/js/admin.js"></script>
+</body>
+
+</html>
