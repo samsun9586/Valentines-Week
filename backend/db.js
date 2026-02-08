@@ -3,10 +3,9 @@ const bcrypt = require('bcryptjs');
 const path = require('path');
 const fs = require('fs');
 
-// Use persistent disk on Render (/data) or local path in development
-const dbPath = process.env.NODE_ENV === 'production'
-  ? '/data/loveMap.db'
-  : path.join(__dirname, 'loveMap.db');
+// Use local data directory for both development and production
+// Render's free tier doesn't allow access to root /data directory
+const dbPath = path.join(__dirname, '..', 'data', 'loveMap.db');
 
 // Ensure the directory exists before creating the database
 const dbDir = path.dirname(dbPath);
