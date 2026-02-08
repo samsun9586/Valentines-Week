@@ -1,11 +1,19 @@
 const Database = require('better-sqlite3');
 const bcrypt = require('bcryptjs');
 const path = require('path');
+const fs = require('fs');
 
 // Use persistent disk on Render (/data) or local path in development
 const dbPath = process.env.NODE_ENV === 'production'
   ? '/data/loveMap.db'
   : path.join(__dirname, 'loveMap.db');
+
+// Ensure the directory exists before creating the database
+const dbDir = path.dirname(dbPath);
+if (!fs.existsSync(dbDir)) {
+  fs.mkdirSync(dbDir, { recursive: true });
+  console.log(`✅ Created database directory: ${dbDir}`);
+}
 
 const db = new Database(dbPath);
 
