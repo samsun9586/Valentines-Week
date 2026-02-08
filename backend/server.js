@@ -10,15 +10,12 @@ const { requireAuth, requireAdmin, verifyPassword } = require('./auth');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Initialize database
-initializeDatabase();
-
 // Middleware
-app.use(cors());
+app.use(cors({ credentials: true, origin: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '..', 'public')));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(path.join(__dirname, '..', 'data', 'uploads')));
 
 // Session configuration
 app.use(session({
@@ -34,10 +31,8 @@ app.use(session({
 // Configure multer for file uploads
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        // Use persistent disk on Render, local uploads in development
-        const uploadDir = process.env.NODE_ENV === 'production'
-            ? '/data/uploads'
-            : path.join(__dirname, 'uploads');
+        // Use local data/uploads directory for both development and production
+        const uploadDir = path.join(__dirname, '..', 'data', 'uploads');
 
         if (!fs.existsSync(uploadDir)) {
             fs.mkdirSync(uploadDir, { recursive: true });
