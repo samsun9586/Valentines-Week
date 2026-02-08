@@ -115,7 +115,7 @@ function displayAdminContent(content) {
     return `
       <div class="content-item content-from-admin">
         <div class="content-meta">
-          <span class="content-author">From Me to You ❤️</span>
+          <span class="content-author">From Suraj ❤️</span>
           <span class="content-time">${new Date(item.created_at).toLocaleString()}</span>
         </div>
         <div class="content-body">
@@ -169,7 +169,7 @@ function displayUserReplies(replies) {
     return `
       <div class="content-item content-from-user">
         <div class="content-meta">
-          <span class="content-author">Your Response 💝</span>
+          <span class="content-author">Gauri's Response 💝</span>
           <span class="content-time">${new Date(reply.created_at).toLocaleString()}</span>
         </div>
         <div class="content-body">

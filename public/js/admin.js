@@ -289,7 +289,7 @@ async function restartDay(milestoneId, title) {
         if (!res.ok) throw new Error('Failed to restart day');
 
         const data = await res.json();
-        alert(`✅ ${data.message}\n${data.deletedCount} item(s) removed.`);
+        alert(`✅ ${data.message}\n\nDeleted:\n- ${data.deletedContent || 0} admin content\n- ${data.deletedReplies || 0} Gauri's replies`);
         loadMilestones(); // Reload to show updated state
     } catch (error) {
         console.error('Restart day error:', error);

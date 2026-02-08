@@ -124,7 +124,8 @@ const dbQueries = {
 
   // Milestone replies
   getMilestoneReplies: db.prepare('SELECT * FROM milestone_replies WHERE milestone_id = ? ORDER BY created_at'),
-  addMilestoneReply: db.prepare('INSERT INTO milestone_replies (milestone_id, type, file_path, text_content) VALUES (?, ?, ?, ?)')
+  addMilestoneReply: db.prepare('INSERT INTO milestone_replies (milestone_id, type, file_path, text_content) VALUES (?, ?, ?, ?)'),
+  deleteMilestoneReplies: db.prepare('DELETE FROM milestone_replies WHERE milestone_id = ?')
 };
 
 module.exports = {

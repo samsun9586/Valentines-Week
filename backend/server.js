@@ -4,7 +4,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const cors = require('cors');
-const { initializeDatabase, getUserByUsername, getAllMilestones, getUnlockedMilestones, getMilestoneById, unlockMilestone, lockMilestone, getMilestoneContent, addMilestoneContent, deleteMilestoneContent, getMilestoneReplies, addMilestoneReply } = require('./db');
+const { initializeDatabase, getUserByUsername, getAllMilestones, getUnlockedMilestones, getMilestoneById, unlockMilestone, lockMilestone, getMilestoneContent, addMilestoneContent, deleteMilestoneContent, getMilestoneReplies, addMilestoneReply, deleteMilestoneReplies } = require('./db');
 const { requireAuth, requireAdmin, verifyPassword } = require('./auth');
 
 const app = express();
@@ -252,13 +252,24 @@ app.delete('/api/milestones/:id/content', requireAdmin, (req, res) => {
             return res.status(404).json({ error: 'Milestone not found' });
         }
 
-        // Get all content to delete associated files
+        // Get all content and replies to delete associated files
         const content = getMilestoneContent.all(id);
+        const replies = getMilestoneReplies.all(id);
 
-        // Delete physical files
+        // Delete physical files for admin content
         content.forEach(item => {
             if (item.file_path) {
-                const filePath = path.join(__dirname, '..', 'public', item.file_path);
+                const filePath = path.join(__dirname, '..', 'data', item.file_path);
+                if (fs.existsSync(filePath)) {
+                    fs.unlinkSync(filePath);
+                }
+            }
+        });
+
+        // Delete physical files for user replies
+        replies.forEach(reply => {
+            if (reply.file_path) {
+                const filePath = path.join(__dirname, '..', 'data', reply.file_path);
                 if (fs.existsSync(filePath)) {
                     fs.unlinkSync(filePath);
                 }
@@ -267,14 +278,16 @@ app.delete('/api/milestones/:id/content', requireAdmin, (req, res) => {
 
         // Delete from database
         deleteMilestoneContent.run(id);
+        deleteMilestoneReplies.run(id);
 
         // Lock the milestone again
         lockMilestone.run(id);
 
         res.json({
             success: true,
-            message: 'All content deleted! Day restarted.',
-            deletedCount: content.length
+            message: 'All content and replies deleted! Day restarted.',
+            deletedContent: content.length,
+            deletedReplies: replies.length
         });
     } catch (error) {
         console.error('Delete content error:', error);
