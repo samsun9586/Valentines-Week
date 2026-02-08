@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Journey - Love Map ❤️</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .journey-page {
+            min-height: 100vh;
+            padding: var(--spacing-md);
+            padding-bottom: 4rem;
+        }
+
+        .journey-header {
+            background: var(--gradient-glass);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+            box-shadow: var(--shadow-card);
+            text-align: center;
+        }
+
+        .journey-header h1 {
+            margin-bottom: 0.5rem;
+        }
+
+        .journey-subtitle {
+            color: var(--dark-gray);
+            font-size: 1rem;
+        }
+
+        .progress-tracker {
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: var(--radius-full);
+            padding: var(--spacing-sm);
+            margin-top: var(--spacing-md);
+            font-weight: 600;
+            color: var(--warm-red);
+        }
+
+        .journey-map {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: var(--spacing-xl) 0;
+            position: relative;
+        }
+
+        .journey-path {
+            position: relative;
+        }
+
+        .path-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--gradient-romantic);
+            transform: translateX(-50%);
+            border-radius: var(--radius-full);
+        }
+
+        .milestone-node {
+            position: relative;
+            margin-bottom: 4rem;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .milestone-node:nth-child(even) {
+            animation-delay: 0.1s;
+        }
+
+        .milestone-node:nth-child(odd) {
+            animation-delay: 0.2s;
+        }
+
+        .node-marker {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            background: var(--white);
+            box-shadow: var(--shadow-soft);
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            z-index: 2;
+        }
+
+        .node-marker.locked {
+            background: var(--light-gray);
+            opacity: 0.6;
+            filter: grayscale(0.8);
+            cursor: not-allowed;
+        }
+
+        .node-marker.unlocked {
+            background: var(--gradient-romantic);
+            box-shadow: var(--shadow-glow);
+            animation: heartbeat 2s infinite;
+        }
+
+        .node-marker:hover:not(.locked) {
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+
+        .node-content {
+            background: var(--gradient-glass);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            min-height: 150px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            box-shadow: var(--shadow-card);
+            transition: all var(--transition-normal);
+        }
+
+        .node-content.locked {
+            opacity: 0.5;
+        }
+
+        .node-content.unlocked {
+            border-color: var(--rose-pink);
+            cursor: pointer;
+        }
+
+        .node-content.unlocked:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .milestone-node:nth-child(odd) .node-content {
+            margin-right: calc(50% + 60px);
+            margin-left: 0;
+        }
+
+        .milestone-node:nth-child(even) .node-content {
+            margin-left: calc(50% + 60px);
+            margin-right: 0;
+        }
+
+        .node-title {
+            font-family: var(--font-heading);
+            font-size: 1.8rem;
+            color: var(--warm-red);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .node-description {
+            color: var(--dark-gray);
+            font-size: 1rem;
+        }
+
+        .unlock-animation {
+            animation: unlock 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .sparkles {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .sparkle {
+            position: absolute;
+            font-size: 1.5rem;
+            animation: sparkle 1s ease-out forwards;
+        }
+
+        .sparkle:nth-child(1) {
+            top: -30px;
+            left: -30px;
+            animation-delay: 0s;
+        }
+
+        .sparkle:nth-child(2) {
+            top: -30px;
+            left: 30px;
+            animation-delay: 0.1s;
+        }
+
+        .sparkle:nth-child(3) {
+            top: 30px;
+            left: -30px;
+            animation-delay: 0.2s;
+        }
+
+        .sparkle:nth-child(4) {
+            top: 30px;
+            left: 30px;
+            animation-delay: 0.3s;
+        }
+
+        .logout-btn-fixed {
+            position: fixed;
+            bottom: var(--spacing-md);
+            right: var(--spacing-md);
+            z-index: 100;
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .journey-map {
+                padding: var(--spacing-md) 0;
+            }
+
+            .milestone-node:nth-child(odd) .node-content,
+            .milestone-node:nth-child(even) .node-content {
+                margin-left: 0;
+                margin-right: 0;
+                margin-top: 100px;
+            }
+
+            .node-marker {
+                top: 0;
+                left: 50%;
+            }
+
+            .path-line {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Floating Hearts Background -->
+    <div class="floating-hearts">
+        <div class="floating-heart" style="top: 10%;">❤️</div>
+        <div class="floating-heart" style="top: 30%;">💕</div>
+        <div class="floating-heart" style="top: 50%;">💝</div>
+        <div class="floating-heart" style="top: 70%;">💖</div>
+        <div class="floating-heart" style="top: 20%;">❤️</div>
+        <div class="floating-heart" style="top: 60%;">💕</div>
+        <div class="floating-heart" style="top: 40%;">💝</div>
+        <div class="floating-heart" style="top: 80%;">💖</div>
+        <div class="floating-heart" style="top: 15%;">❤️</div>
+    </div>
+
+    <div class="journey-page">
+        <div class="journey-header">
+            <h1>Our Love Journey</h1>
+            <p class="journey-subtitle">8 Days of Valentine's 💕</p>
+            <div class="progress-tracker">
+                <span id="progressText">Loading...</span>
+            </div>
+        </div>
+
+        <div class="journey-map">
+            <div class="journey-path">
+                <div class="path-line"></div>
+                <div id="milestonesContainer">
+                    <!-- Milestones will be loaded here -->
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="logout-btn-fixed">
+        <button onclick="logout()" class="btn btn-secondary">
+            <span>Logout</span>
+        </button>
+    </div>
+
+    <script src="/js/auth.js"></script>
+    <script src="/js/journey.js"></script>
+</body>
+
+</html>
